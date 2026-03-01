@@ -1,4 +1,4 @@
-import * as mariadb from "mariadb";
+import { createPool, Pool, ConnectionConfig } from "mariadb";
 import {
   Connector,
   ConnectorType,
@@ -26,7 +26,7 @@ import { splitSQLStatements } from "../../utils/sql-parser.js";
  * - Any other value: Standard SSL connection with certificate verification
  */
 class MariadbDSNParser implements DSNParser {
-  async parse(dsn: string, config?: ConnectorConfig): Promise<mariadb.ConnectionConfig> {
+  async parse(dsn: string, config?: ConnectorConfig): Promise<ConnectionConfig> {
     const connectionTimeoutSeconds = config?.connectionTimeoutSeconds;
     const queryTimeoutSeconds = config?.queryTimeoutSeconds;
     // Basic validation
@@ -43,7 +43,7 @@ class MariadbDSNParser implements DSNParser {
       // This will handle special characters in passwords, etc.
       const url = new SafeURL(dsn);
 
-      const connectionConfig: mariadb.ConnectionConfig = {
+      const connectionConfig: ConnectionConfig = {
         host: url.hostname,
         port: url.port ? parseInt(url.port) : 3306,
         database: url.pathname ? url.pathname.substring(1) : '', // Remove leading '/' if exists
@@ -112,7 +112,7 @@ export class MariaDBConnector implements Connector {
   name = "MariaDB";
   dsnParser = new MariadbDSNParser();
 
-  private pool: mariadb.Pool | null = null;
+  private pool: Pool | null = null;
   // Source ID is set by ConnectorManager after cloning
   private sourceId: string = "default";
 
@@ -128,7 +128,7 @@ export class MariaDBConnector implements Connector {
     try {
       const connectionConfig = await this.dsnParser.parse(dsn, config);
 
-      this.pool = mariadb.createPool(connectionConfig);
+      this.pool = createPool(connectionConfig);
 
       // Test the connection
       await this.pool.query("SELECT 1");
