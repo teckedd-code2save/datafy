@@ -1,11 +1,11 @@
 ---
 name: testing
-description: Run and troubleshoot tests for DBHub, including unit tests, integration tests with Testcontainers, and database-specific tests. Use when asked to run tests, fix test failures, debug integration tests, or troubleshoot Docker/database container issues.
+description: Run and troubleshoot tests for Datafy, including unit tests, integration tests with Testcontainers, and database-specific tests. Use when asked to run tests, fix test failures, debug integration tests, or troubleshoot Docker/database container issues.
 ---
 
 # Testing Skill
 
-This skill helps you run and troubleshoot tests in the DBHub project.
+This skill helps you run and troubleshoot tests in the Datafy project.
 
 ## Quick Commands
 
@@ -46,6 +46,12 @@ pnpm test src/connectors/__tests__/sqlserver.integration.test.ts
 
 # SQLite
 pnpm test src/connectors/__tests__/sqlite.integration.test.ts
+
+# Redis
+pnpm test src/connectors/__tests__/redis.integration.test.ts
+
+# Elasticsearch
+pnpm test src/connectors/__tests__/elasticsearch.integration.test.ts
 
 # JSON RPC integration
 pnpm test src/__tests__/json-rpc-integration.test.ts

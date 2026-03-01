@@ -1,16 +1,16 @@
 {
-  "name": "dbhub",
+  "name": "@teckedd-code2save/datafy",
   "version": "0.17.0",
-  "mcpName": "io.github.bytebase/dbhub",
+  "mcpName": "io.github.teckedd-code2save/datafy",
   "description": "Minimal, token-efficient Database MCP Server for PostgreSQL, MySQL, SQL Server, SQLite, MariaDB, Redis, and Elasticsearch with code generation",
   "repository": {
     "type": "git",
-    "url": "https://github.com/bytebase/dbhub.git"
+    "url": "https://github.com/teckedd-code2save/datafy.git"
   },
   "main": "dist/index.js",
   "type": "module",
   "bin": {
-    "dbhub": "dist/index.js"
+    "datafy": "dist/index.js"
   },
   "files": [
     "dist",

@@ -2,9 +2,9 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-# DBHub Development Guidelines
+# Datafy Development Guidelines
 
-DBHub is a zero-dependency, token efficient database MCP server implementing the Model Context Protocol (MCP) server interface. This lightweight server bridges MCP-compatible clients (Claude Desktop, Claude Code, Cursor) with various database systems.
+Datafy is a zero-dependency, token efficient database MCP server implementing the Model Context Protocol (MCP) server interface. This lightweight server bridges MCP-compatible clients (Claude Desktop, Claude Code, Cursor) with various database systems.
 
 ## Commands
 
@@ -26,7 +26,9 @@ src/
 │   ├── mysql/           # MySQL connector
 │   ├── mariadb/         # MariaDB connector
 │   ├── sqlserver/       # SQL Server connector
-│   └── sqlite/          # SQLite connector
+│   ├── sqlite/          # SQLite connector
+│   ├── redis/           # Redis connector
+│   └── elasticsearch/   # Elasticsearch connector
 ├── tools/               # MCP tool handlers
 │   ├── execute-sql.ts   # SQL execution handler
 │   └── search-objects.ts  # Unified search/list with progressive disclosure
@@ -63,7 +65,7 @@ Key architectural patterns:
 
 ## Configuration
 
-DBHub supports three configuration methods (in priority order):
+Datafy supports three configuration methods (in priority order):
 
 ### 1. TOML Configuration File (Multi-Database)
 **Recommended for projects requiring multiple database connections**
@@ -147,6 +149,8 @@ DBHub supports three configuration methods (in priority order):
   - SQL Server (named instance): `sqlserver://user:password@localhost:1433/dbname?instanceName=ENV1`
   - SQL Server (NTLM): `sqlserver://user:password@localhost:1433/dbname?authentication=ntlm&domain=MYDOMAIN`
   - SQLite: `sqlite:///path/to/database.db` or `sqlite:///:memory:`
+  - Redis: `redis://default:password@localhost:6379`
+  - Elasticsearch: `elasticsearch://localhost:9200`
 - SSL modes: `sslmode=disable` (no SSL) or `sslmode=require` (SSL without cert verification)
 
 ## Testing Approach
@@ -165,7 +169,7 @@ Key points:
 
 ## SSH Tunnel Support
 
-DBHub supports SSH tunnels for secure database connections through bastion hosts:
+Datafy supports SSH tunnels for secure database connections through bastion hosts:
 
 - Configuration via command-line options: `--ssh-host`, `--ssh-port`, `--ssh-user`, `--ssh-password`, `--ssh-key`, `--ssh-passphrase`
 - Configuration via environment variables: `SSH_HOST`, `SSH_PORT`, `SSH_USER`, `SSH_PASSWORD`, `SSH_KEY`, `SSH_PASSPHRASE`

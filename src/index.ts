@@ -13,7 +13,7 @@ import "./connectors/elasticsearch/index.js"; // Elasticsearch connector
 import { main } from "./server.js";
 
 /**
- * Entry point for the DBHub MCP Server
+ * Entry point for the Datafy MCP Server
  * Handles top-level exceptions and starts the server
  */
 main().catch((error) => {
