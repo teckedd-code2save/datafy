@@ -1,15 +1,7 @@
 > [!NOTE]  
 > Datafy is deeply rooted in and built upon [DBHub](https://github.com/bytebase/dbhub). Their documentation and implementation remain a highly relevant foundation.
 
-<p align="center">
-<a href="https://github.com/teckedd-code2save/datafy" target="_blank">
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/teckedd-code2save/datafy/main/docs/images/logo/full-dark.svg" width="75%">
-  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/teckedd-code2save/datafy/main/docs/images/logo/full-light.svg" width="75%">
-  <img src="https://raw.githubusercontent.com/teckedd-code2save/datafy/main/docs/images/logo/full-light.svg" width="75%" alt="Datafy Logo">
-</picture>
-</a>
-</p>
+
 
 ```bash
             +------------------+    +--------------+    +------------------+
@@ -53,11 +45,7 @@ Datafy implements MCP tools for database operations:
 - **[elasticsearch_search](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-your-data.html)**: Execute Elasticsearch queries using JSON DSL or simplified syntax
 - **[Custom Tools](https://dbhub.ai/tools/custom-tools)**: Define reusable, parameterized SQL operations in your `dbhub.toml` configuration file
 
-## Workbench
 
-Datafy includes a [built-in web interface](https://dbhub.ai/workbench/overview) for interacting with your database tools. It provides a visual way to execute queries, run custom tools, and view request traces without requiring an MCP client.
-
-![workbench](https://raw.githubusercontent.com/bytebase/dbhub/main/docs/images/workbench/workbench.webp)
 
 ## Installation
 
@@ -112,12 +100,3 @@ pnpm build && pnpm start --transport stdio --dsn "postgres://user:password@local
 
 See [Testing](.claude/skills/testing/SKILL.md) and [Debug](https://dbhub.ai/config/debug).
 
-## Contributors
-
-<a href="https://github.com/teckedd-code2save/datafy/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=teckedd-code2save/datafy" />
-</a>
-
-## Star History
-
-![Star History Chart](https://api.star-history.com/svg?repos=teckedd-code2save/datafy&type=Date)
