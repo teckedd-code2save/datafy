@@ -1,7 +1,20 @@
+# Datafy
+
 > [!NOTE]  
 > Datafy is deeply rooted in and built upon [DBHub](https://github.com/bytebase/dbhub). Their documentation and implementation remain a highly relevant foundation.
 
 
+
+## Database MCP Gateway Architecture
+
+```text
+  ____        _         __       
+ |  _ \  __ _| |_ __ _ / _|_   _ 
+ | | | |/ _` | __/ _` | |_| | | |
+ | |_| | (_| | || (_| |  _| |_| |
+ |____/ \__,_|\__\__,_|_|  \__, |
+                           |___/ 
+```
 
 ```bash
             +------------------+    +--------------+    +------------------+
