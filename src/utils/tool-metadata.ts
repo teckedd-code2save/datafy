@@ -8,7 +8,7 @@ import { redisCommandSchema } from "../tools/redis-command-handler.js";
 import { elasticsearchSearchSchema } from "../tools/elasticsearch-search-handler.js";
 import { getToolRegistry } from "../tools/registry.js";
 import { BUILTIN_TOOL_EXECUTE_SQL } from "../tools/builtin-tools.js";
-import type { ParameterConfig, ToolConfig } from "../types/config.js";
+import type { ParameterConfig, ToolConfig, CustomToolConfig } from "../types/config.js";
 
 /**
  * Tool parameter definition for API responses
@@ -138,6 +138,41 @@ export function getExecuteSqlMetadata(sourceId: string): ToolMetadata {
 }
 
 /**
+ * Get execute_admin_sql tool metadata for a specific source
+ * @param sourceId - The source ID to get tool metadata for
+ * @returns Tool metadata with name, description, and Zod schema
+ */
+export function getExecuteAdminSqlMetadata(sourceId: string): ToolMetadata {
+  const sourceIds = ConnectorManager.getAvailableSourceIds();
+  const sourceConfig = ConnectorManager.getSourceConfig(sourceId)!;
+  const dbType = sourceConfig.type;
+  const isSingleSource = sourceIds.length === 1;
+
+  const toolName = isSingleSource ? "execute_admin_sql" : `execute_admin_sql_${normalizeSourceId(sourceId)}`;
+  const title = isSingleSource
+    ? `Execute Admin SQL (${dbType})`
+    : `Execute Admin SQL on ${sourceId} (${dbType})`;
+  const description = isSingleSource
+    ? `Execute administrative SQL queries on the ${dbType} default/system database (useful for CREATE DATABASE commands)`
+    : `Execute administrative SQL queries on the '${sourceId}' ${dbType} default/system database (useful for CREATE DATABASE commands)`;
+
+  const annotations = {
+    title,
+    readOnlyHint: false,
+    destructiveHint: true,
+    idempotentHint: false,
+    openWorldHint: false,
+  };
+
+  return {
+    name: toolName,
+    description,
+    schema: executeSqlSchema, // uses same schema structure as execute_sql
+    annotations,
+  };
+}
+
+/**
  * Get search_objects tool metadata for a specific source
  * @param sourceId - The source ID to get tool metadata for
  * @returns Tool name, description, and annotations
@@ -243,6 +278,21 @@ function buildExecuteSqlTool(sourceId: string, toolConfig?: ToolConfig): Tool {
 }
 
 /**
+ * Build execute_admin_sql tool metadata for API response
+ */
+function buildExecuteAdminSqlTool(sourceId: string): Tool {
+  const metadata = getExecuteAdminSqlMetadata(sourceId);
+  const parameters = zodToParameters(metadata.schema);
+
+  return {
+    name: metadata.name,
+    description: metadata.description,
+    parameters: parameters,
+    readonly: false,
+  };
+}
+
+/**
  * Build search_objects tool metadata for API response
  */
 function buildSearchObjectsTool(sourceId: string): Tool {
@@ -297,13 +347,14 @@ function buildSearchObjectsTool(sourceId: string): Tool {
  * Build custom tool metadata for API response
  */
 function buildCustomTool(toolConfig: ToolConfig): Tool {
+  const customConfig = toolConfig as CustomToolConfig;
   return {
-    name: toolConfig.name,
-    description: toolConfig.description!,
-    parameters: customParamsToToolParams(toolConfig.parameters),
-    statement: toolConfig.statement,
-    readonly: toolConfig.readonly,
-    max_rows: toolConfig.max_rows,
+    name: customConfig.name,
+    description: customConfig.description,
+    parameters: customParamsToToolParams(customConfig.parameters),
+    statement: customConfig.statement,
+    readonly: customConfig.readonly,
+    max_rows: customConfig.max_rows,
   };
 }
 
@@ -323,6 +374,8 @@ export function getToolsForSource(sourceId: string): Tool[] {
     // Dispatch based on tool name
     if (toolConfig.name === "execute_sql") {
       return buildExecuteSqlTool(sourceId, toolConfig);
+    } else if (toolConfig.name === "execute_admin_sql") {
+      return buildExecuteAdminSqlTool(sourceId);
     } else if (toolConfig.name === "search_objects") {
       return buildSearchObjectsTool(sourceId);
     } else if (toolConfig.name === "redis_command") {

@@ -3,7 +3,7 @@
  * Manages tool enablement and configuration across multiple database sources
  */
 
-import type { TomlConfig, ToolConfig, ExecuteSqlToolConfig, SearchObjectsToolConfig, ParameterConfig } from "../types/config.js";
+import type { TomlConfig, ToolConfig, ExecuteSqlToolConfig, ExecuteAdminSqlToolConfig, SearchObjectsToolConfig, ParameterConfig } from "../types/config.js";
 import { BUILTIN_TOOLS } from "./builtin-tools.js";
 import { ConnectorManager } from "../connectors/manager.js";
 import { validateParameters } from "../utils/parameter-mapper.js";
@@ -45,7 +45,7 @@ export class ToolRegistry {
    * Check if a tool name is a built-in tool
    */
   private isBuiltinTool(toolName: string): boolean {
-    return BUILTIN_TOOLS.includes(toolName);
+    return (BUILTIN_TOOLS as readonly string[]).includes(toolName);
   }
 
   /**
@@ -66,7 +66,7 @@ export class ToolRegistry {
     if (!validTypes.includes(param.type)) {
       throw new Error(
         `Tool '${toolName}', parameter '${param.name}' has invalid type '${param.type}'. ` +
-          `Valid types: ${validTypes.join(", ")}`
+        `Valid types: ${validTypes.join(", ")}`
       );
     }
 
@@ -96,7 +96,7 @@ export class ToolRegistry {
       if (!param.allowed_values.includes(param.default)) {
         throw new Error(
           `Tool '${toolName}', parameter '${param.name}': default value '${param.default}' ` +
-            `is not in allowed_values: ${param.allowed_values.join(", ")}`
+          `is not in allowed_values: ${param.allowed_values.join(", ")}`
         );
       }
     }
@@ -105,7 +105,7 @@ export class ToolRegistry {
   /**
    * Validate a custom tool configuration
    */
-  private validateCustomTool(toolConfig: ToolConfig, availableSources: string[]): void {
+  private validateCustomTool(toolConfig: any, availableSources: string[]): void {
     // 1. Validate required fields
     if (!toolConfig.name || toolConfig.name.trim() === "") {
       throw new Error("Tool definition missing required field: name");
@@ -133,7 +133,7 @@ export class ToolRegistry {
     if (!availableSources.includes(toolConfig.source)) {
       throw new Error(
         `Tool '${toolConfig.name}' references unknown source '${toolConfig.source}'. ` +
-          `Available sources: ${availableSources.join(", ")}`
+        `Available sources: ${availableSources.join(", ")}`
       );
     }
 
@@ -145,7 +145,7 @@ export class ToolRegistry {
       ) {
         throw new Error(
           `Tool name '${toolConfig.name}' conflicts with built-in tool naming pattern. ` +
-            `Custom tools cannot use names starting with: ${BUILTIN_TOOLS.join(", ")}`
+          `Custom tools cannot use names starting with: ${BUILTIN_TOOLS.join(", ")}`
         );
       }
     }
@@ -208,18 +208,19 @@ export class ToolRegistry {
     for (const source of config.sources) {
       if (!registry.has(source.id)) {
         const defaultTools: ToolConfig[] = [];
-        
+
         // Only SQL databases get execute_sql and search_objects
         // Non-SQL connectors (redis, elasticsearch) should define custom tools in TOML
         if (isSqlDatabase(source.type)) {
           defaultTools.push({ name: 'execute_sql', source: source.id } satisfies ExecuteSqlToolConfig);
+          defaultTools.push({ name: 'execute_admin_sql', source: source.id } satisfies ExecuteAdminSqlToolConfig);
           defaultTools.push({ name: 'search_objects', source: source.id } satisfies SearchObjectsToolConfig);
         } else if (isRedisDatabase(source.type)) {
           defaultTools.push({ name: 'redis_command', source: source.id } as ToolConfig);
         } else if (isElasticsearchDatabase(source.type)) {
           defaultTools.push({ name: 'elasticsearch_search', source: source.id } as ToolConfig);
         }
-        
+
         registry.set(source.id, defaultTools);
       }
     }

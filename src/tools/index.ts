@@ -5,12 +5,13 @@ import { createRedisCommandToolHandler, redisCommandSchema } from "./redis-comma
 import { createElasticsearchSearchToolHandler, elasticsearchSearchSchema } from "./elasticsearch-search-handler.js";
 import { createGenerateCodeToolHandler } from "./generate-code-handler.js";
 import { ConnectorManager } from "../connectors/manager.js";
-import { getExecuteSqlMetadata, getSearchObjectsMetadata, getRedisCommandMetadata, getElasticsearchSearchMetadata, getGenerateCodeMetadata } from "../utils/tool-metadata.js";
+import { getExecuteSqlMetadata, getSearchObjectsMetadata, getRedisCommandMetadata, getElasticsearchSearchMetadata, getGenerateCodeMetadata, getExecuteAdminSqlMetadata } from "../utils/tool-metadata.js";
 import { isReadOnlySQL } from "../utils/allowed-keywords.js";
 import { createCustomToolHandler, buildZodSchemaFromParameters } from "./custom-tool-handler.js";
-import type { ToolConfig } from "../types/config.js";
+import type { ToolConfig, CustomToolConfig } from "../types/config.js";
 import { getToolRegistry } from "./registry.js";
-import { BUILTIN_TOOL_EXECUTE_SQL, BUILTIN_TOOL_SEARCH_OBJECTS, BUILTIN_TOOL_REDIS_COMMAND, BUILTIN_TOOL_ELASTICSEARCH_SEARCH, BUILTIN_TOOL_GENERATE_CODE } from "./builtin-tools.js";
+import { BUILTIN_TOOL_EXECUTE_SQL, BUILTIN_TOOL_EXECUTE_ADMIN_SQL, BUILTIN_TOOL_SEARCH_OBJECTS, BUILTIN_TOOL_REDIS_COMMAND, BUILTIN_TOOL_ELASTICSEARCH_SEARCH } from "./builtin-tools.js";
+import { createExecuteAdminSqlToolHandler } from "./execute-admin-sql.js";
 
 /**
  * Register all tool handlers with the MCP server
@@ -37,6 +38,8 @@ export function registerTools(server: McpServer): void {
       // Register based on tool name (built-in vs custom)
       if (toolConfig.name === BUILTIN_TOOL_EXECUTE_SQL) {
         registerExecuteSqlTool(server, sourceId);
+      } else if (toolConfig.name === BUILTIN_TOOL_EXECUTE_ADMIN_SQL) {
+        registerExecuteAdminSqlTool(server, sourceId);
       } else if (toolConfig.name === BUILTIN_TOOL_SEARCH_OBJECTS) {
         registerSearchObjectsTool(server, sourceId);
       } else if (toolConfig.name === BUILTIN_TOOL_REDIS_COMMAND) {
@@ -67,6 +70,25 @@ function registerExecuteSqlTool(
       annotations: metadata.annotations,
     },
     createExecuteSqlToolHandler(sourceId)
+  );
+}
+
+/**
+ * Register execute_admin_sql tool for a source
+ */
+function registerExecuteAdminSqlTool(
+  server: McpServer,
+  sourceId: string
+): void {
+  const metadata = getExecuteAdminSqlMetadata(sourceId);
+  server.registerTool(
+    metadata.name,
+    {
+      description: metadata.description,
+      inputSchema: metadata.schema,
+      annotations: metadata.annotations,
+    },
+    createExecuteAdminSqlToolHandler(sourceId)
   );
 }
 
@@ -163,24 +185,25 @@ function registerCustomTool(
 
   const sourceConfig = ConnectorManager.getSourceConfig(sourceId)!;
   const dbType = sourceConfig.type;
+  const customConfig = toolConfig as CustomToolConfig;
 
-  const isReadOnly = isReadOnlySQL(toolConfig.statement, dbType);
-  const zodSchema = buildZodSchemaFromParameters(toolConfig.parameters);
+  const isReadOnly = isReadOnlySQL(customConfig.statement, dbType);
+  const zodSchema = buildZodSchemaFromParameters(customConfig.parameters);
 
   server.registerTool(
-    toolConfig.name,
+    customConfig.name,
     {
-      description: toolConfig.description,
+      description: customConfig.description,
       inputSchema: zodSchema,
       annotations: {
-        title: `${toolConfig.name} (${dbType})`,
+        title: `${customConfig.name} (${dbType})`,
         readOnlyHint: isReadOnly,
         destructiveHint: !isReadOnly,
         idempotentHint: isReadOnly,
         openWorldHint: false,
       },
     },
-    createCustomToolHandler(toolConfig)
+    createCustomToolHandler(customConfig)
   );
 }
 

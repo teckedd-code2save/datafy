@@ -79,6 +79,14 @@ export interface ExecuteSqlToolConfig {
 }
 
 /**
+ * Built-in tool configuration for execute_admin_sql
+ */
+export interface ExecuteAdminSqlToolConfig {
+  name: "execute_admin_sql"; // Must match BUILTIN_TOOL_EXECUTE_ADMIN_SQL from builtin-tools.ts
+  source: string;
+}
+
+/**
  * Built-in tool configuration for search_objects
  */
 export interface SearchObjectsToolConfig {
@@ -102,7 +110,7 @@ export interface CustomToolConfig {
 /**
  * Unified tool configuration (discriminated union)
  */
-export type ToolConfig = ExecuteSqlToolConfig | SearchObjectsToolConfig | CustomToolConfig;
+export type ToolConfig = ExecuteSqlToolConfig | ExecuteAdminSqlToolConfig | SearchObjectsToolConfig | CustomToolConfig;
 
 /**
  * Complete TOML configuration file structure

@@ -25,7 +25,7 @@ export function createGenerateCodeToolHandler() {
       return {
         content: [
           {
-            type: "text",
+            type: "text" as const,
             text: formatCodeResponse(result),
           },
         ],
@@ -34,7 +34,7 @@ export function createGenerateCodeToolHandler() {
       return {
         content: [
           {
-            type: "text",
+            type: "text" as const,
             text: `Error generating code: ${error}`,
           },
         ],
