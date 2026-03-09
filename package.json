@@ -1,6 +1,6 @@
 {
   "name": "@teckedd-code2save/datafy",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "mcpName": "io.github.teckedd-code2save/datafy",
   "description": "Minimal, token-efficient Database MCP Server for PostgreSQL, MySQL, SQL Server, SQLite, MariaDB, Redis, and Elasticsearch with code generation",
   "repository": {
